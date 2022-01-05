@@ -50,6 +50,15 @@
       environment: "{{ app_environment }}"
       when: app_updated.changed == true
       notify: restart nginx
+    
+    - name: Perform deployment-related rake tasks.
+      command: "{{ item }} chdir={{ app_directory }}"
+      with_items:
+        - bundle exec rake db:migrate
+        - bundle exec rake assets:precompile
+      environment: "{{ app_environment }}"
+      when: app_updated.changed == true
+      notify: restart nginx
 
     - name: Ensure demo application has correct user for files.
       file:
